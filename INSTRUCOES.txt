@@ -1,0 +1,110 @@
+Documentação gerada com ajuda de IA
+================================================================================
+                    SISTEMA DE BIBLIOTECA - INSTRUÇÕES RÁPIDAS
+================================================================================
+
+🚀 INICIAR RÁPIDO (Assume MongoDB já instalado e rodando):
+
+1. Instalar dependências:
+   npm install
+
+2. Popular banco (opcional):
+   node seed.js
+
+3. Iniciar servidor:
+   npm start
+
+4. Acessar no navegador:
+   http://localhost:3000
+
+================================================================================
+
+📋 FUNCIONALIDADES:
+
+✅ LIVROS
+   - Adicionar novos livros com título, autor, ISBN e quantidade
+   - Visualizar todos os livros em cards modernos
+   - Remover livros do acervo
+
+✅ EMPRÉSTIMOS
+   - Emprestar livros aos usuários
+   - Devolução automática prevista para 14 dias
+   - Registrar devoluções
+
+✅ INTERFACE
+   - Design moderno com gradientes e animações
+   - Responsivo (funciona em desktop, tablet e mobile)
+   - 3 abas: Livros, Emprestar, Empréstimos
+
+================================================================================
+
+📚 DADOS INICIAIS:
+
+O banco vem populado com 20 clássicos da literatura brasileira:
+- Dom Casmurro - Machado de Assis
+- Grande Sertão: Veredas - Guimarães Rosa
+- Capitães da Areia - Jorge Amado
+- + 17
+
+================================================================================
+
+🗄️ BANCO DE DADOS MongoDB:
+
+Nome do banco: biblioteca
+Coleções: livros, emprestimos
+
+Estrutura de Livros:
+{
+  _id: ObjectId,
+  titulo: String,
+  autor: String,
+  isbn: String,
+  quantidade: Number,
+  disponiveis: Number,
+  criadoEm: Date
+}
+
+Estrutura de Empréstimos:
+{
+  _id: ObjectId,
+  livroId: ObjectId,
+  tituloLivro: String,
+  nomeUsuario: String,
+  emailUsuario: String,
+  dataEmprestimo: Date,
+  devolucaoPrevista: Date,
+  status: "ativo" | "devolvido"
+}
+
+================================================================================
+
+🔌 API REST:
+
+GET    /livros              - Listar todos os livros
+GET    /livros/:id          - Buscar livro por ID
+POST   /livros              - Criar novo livro
+PUT    /livros/:id          - Atualizar livro
+DELETE /livros/:id          - Remover livro
+
+GET    /emprestimos         - Listar empréstimos
+GET    /emprestimos/:id     - Buscar empréstimo
+POST   /emprestimos         - Criar empréstimo
+PATCH  /emprestimos/:id/devolver - Devolver livro
+
+================================================================================
+
+📁 ESTRUTURA DO PROJETO:
+
+sistemaBiblioteca/
+├── src/
+│   ├── public/
+│   │   └── index.html      ← Frontend
+│   ├── db.js               ← Conexão MongoDB
+│   ├── Livros.js          ← API Livros
+│   ├── Emprestimos.js     ← API Empréstimos
+│   └── Server.js          ← Servidor Express
+├── seed.js                 ← Popular banco
+├── package.json           ← Dependências
+├── README.md              ← Documentação completa
+├── SETUP.md              ← Guia passo-a-passo
+└── LICENSE               ← Licença ISC

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 Sistema de Biblioteca</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    header h1 {
+      color: #667eea;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: #666;
+      font-size: 1.1em;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: white;
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .tab-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .tab-btn.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-row .form-group {
+      margin-bottom: 0;
+    }
+
+    button {
+      background: #667eea;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #764ba2;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #667eea;
+      color: white;
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    tr:hover {
+      background: #f5f5f5;
+    }
+
+    .status-ativo {
+      background: #d4edda;
+      color: #155724;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .status-devolvido {
+      background: #cce5ff;
+      color: #004085;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .btn-small {
+      padding: 8px 15px;
+      font-size: 0.9em;
+      margin: 0 5px;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-success {
+      background: #28a745;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .empty-state p {
+      font-size: 1.2em;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 1.8em;
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .tab-btn {
+        width: 100%;
+      }
+
+      table {
+        font-size: 0.9em;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 Sistema de Biblioteca</h1>
+      <p>Gerenciamento de livros e empréstimos</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="abrirAba('livros')">📖 Livros</button>
+      <button class="tab-btn" onclick="abrirAba('emprestar')">📤 Emprestar</button>
+      <button class="tab-btn" onclick="abrirAba('emprestimos')">📋 Empréstimos</button>
+    </div>
+
+    <!-- Aba Livros -->
+    <div id="livros" class="tab-content active">
+      <div id="mensagem-livros" class="message"></div>
+      
+      <h2>Cadastrar Novo Livro</h2>
+      <form onsubmit="adicionarLivro(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="titulo">Título</label>
+            <input type="text" id="titulo" required>
+          </div>
+          <div class="form-group">
+            <label for="autor">Autor</label>
+            <input type="text" id="autor" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" required>
+          </div>
+          <div class="form-group">
+            <label for="quantidade">Quantidade</label>
+            <input type="number" id="quantidade" min="1" required>
+          </div>
+        </div>
+        <button type="submit">Adicionar Livro</button>
+      </form>
+
+      <h2 style="margin-top: 40px;">Livros Cadastrados</h2>
+      <div class="table-container">
+        <table id="tabela-livros">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>ISBN</th>
+              <th>Total</th>
+              <th>Disponíveis</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-livros">
+            <tr><td colspan="6" class="empty-state"><p>Carregando livros...</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba Emprestar -->
+    <div id="emprestar" class="tab-content">
+      <div id="mensagem-emprestar" class="message"></div>
+      
+      <h2>Realizar Empréstimo</h2>
+      <form onsubmit="realizarEmprestimo(event)">
+        <div class="form-group">
+          <label for="livro-select">Selecionar Livro</label>
+          <select id="livro-select" required onchange="atualizarDisponibilidade()">
+            <option value="">-- Escolha um livro --</option>
+          </select>
+          <small id="disponibilidade-info" style="color: #666; margin-top: 5px; display: block;"></small>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nome-usuario">Nome do Usuário</label>
+            <input type="text" id="nome-usuario" required>
+          </div>
+          <div class="form-group">
+            <label for="email-usuario">Email</label>
+            <input type="email" id="email-usuario" required>
+          </div>
+        </div>
+        <button type="submit">Emprestar Livro</button>
+      </form>
+    </div>
+
+    <!-- Aba Empréstimos -->
+    <div id="emprestimos" class="tab-content">
+      <div id="mensagem-emprestimos" class="message"></div>
+      
+      <h2>Empréstimos Ativos</h2>
+      <div class="table-container">
+        <table id="tabela-emprestimos">
+          <thead>
+            <tr>
+              <th>Livro</th>
+              <th>Usuário</th>
+              <th>Email</th>
+              <th>Data Empréstimo</th>
+              <th>Devolução Prevista</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-emprestimos">
+            <tr><td colspan="7" class="empty-state"><p>Carregando empréstimos...</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000';
+
+    function abrirAba(nomeAba) {
+      // Esconder todas as abas
+      document.querySelectorAll('.tab-content').forEach(aba => {
+        aba.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Mostrar aba selecionada
+      document.getElementById(nomeAba).classList.add('active');
+      event.target.classList.add('active');
+
+      // Carregar dados específicos da aba
+      if (nomeAba === 'livros') {
+        carregarLivros();
+      } else if (nomeAba === 'emprestar') {
+        carregarLivrosDisponiveisPara();
+      } else if (nomeAba === 'emprestimos') {
+        carregarEmprestimos();
+      }
+    }
+
+    function mostrarMensagem(abaId, mensagem, tipo = 'success') {
+      const elemento = document.getElementById(`mensagem-${abaId}`);
+      elemento.textContent = mensagem;
+      elemento.className = `message ${tipo}`;
+      setTimeout(() => {
+        elemento.className = 'message';
+      }, 5000);
+    }
+
+    // ========== LIVROS ==========
+    async function carregarLivros() {
+      try {
+        const response = await fetch(`${API_URL}/livros`);
+        const livros = await response.json();
+        const tbody = document.getElementById('tbody-livros');
+
+        if (livros.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>Nenhum livro cadastrado</p></td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = livros.map(livro => `
+          <tr>
+            <td><strong>${livro.titulo}</strong></td>
+            <td>${livro.autor}</td>
+            <td>${livro.isbn}</td>
+            <td>${livro.quantidade}</td>
+            <td><strong style="color: ${livro.disponiveis > 0 ? '#28a745' : '#dc3545'}">${livro.disponiveis}</strong></td>
+            <td>
+              <button class="btn-small btn-danger" onclick="deletarLivro('${livro._id}')">Remover</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (erro) {
+        console.error('Erro ao carregar livros:', erro);
+        mostrarMensagem('livros', 'Erro ao carregar livros', 'error');
+      }
+    }
+
+    async function adicionarLivro(event) {
+      event.preventDefault();
+      const livro = {
+        titulo: document.getElementById('titulo').value,
+        autor: document.getElementById('autor').value,
+        isbn: document.getElementById('isbn').value,
+        quantidade: parseInt(document.getElementById('quantidade').value)
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/livros`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(livro)
+        });
+
+        if (response.ok) {
+          event.target.reset();
+          mostrarMensagem('livros', '✅ Livro adicionado com sucesso!');
+          carregarLivros();
+          carregarLivrosDisponiveisPara();
+        } else {
+          const erro = await response.json();
+          mostrarMensagem('livros', `❌ ${erro.erro}`, 'error');
+        }
+      } catch (erro) {
+        mostrarMensagem('livros', '❌ Erro ao adicionar livro', 'error');
+      }
+    }
+
+    async function deletarLivro(id) {
+      if (!confirm('Tem certeza que deseja remover este livro?')) return;
+
+      try {
+        const response = await fetch(`${API_URL}/livros/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          mostrarMensagem('livros', '✅ Livro removido com sucesso!');
+          carregarLivros();
+        } else {
+          const erro = await response.json();
+          mostrarMensagem('livros', `❌ ${erro.erro}`, 'error');
+        }
+      } catch (erro) {
+        mostrarMensagem('livros', '❌ Erro ao remover livro', 'error');
+      }
+    }
+
+    // ========== EMPRÉSTIMOS ==========
+    async function carregarLivrosDisponiveisPara() {
+      try {
+        const response = await fetch(`${API_URL}/livros`);
+        const livros = await response.json();
+        const select = document.getElementById('livro-select');
+
+        select.innerHTML = '<option value="">-- Escolha um livro --</option>' +
+          livros
+            .filter(l => l.disponiveis > 0)
+            .map(livro => `<option value="${livro._id}" data-disponivel="${livro.disponiveis}">${livro.titulo}</option>`)
+            .join('');
+      } catch (erro) {
+        console.error('Erro ao carregar livros:', erro);
+      }
+    }
+
+    function atualizarDisponibilidade() {
+      const select = document.getElementById('livro-select');
+      const opcaoSelecionada = select.options[select.selectedIndex];
+      const disponivel = opcaoSelecionada.dataset.disponivel;
+      const info = document.getElementById('disponibilidade-info');
+
+      if (disponivel) {
+        info.textContent = `📚 ${disponivel} exemplar(es) disponível(is)`;
+      }
+    }
+
+    async function realizarEmprestimo(event) {
+      event.preventDefault();
+
+      const livroId = document.getElementById('livro-select').value;
+      const emprestimo = {
+        livroId,
+        nomeUsuario: document.getElementById('nome-usuario').value,
+        emailUsuario: document.getElementById('email-usuario').value
+      };
+
+      try {
+        const response = await fetch(`${API_URL}/emprestimos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(emprestimo)
+        });
+
+        if (response.ok) {
+          const resultado = await response.json();
+          event.target.reset();
+          mostrarMensagem('emprestar', `✅ Empréstimo realizado! Devolução prevista para ${new Date(resultado.devolucaoPrevista).toLocaleDateString('pt-BR')}`);
+          carregarLivrosDisponiveisPara();
+          setTimeout(() => carregarEmprestimos(), 1000);
+        } else {
+          const erro = await response.json();
+          mostrarMensagem('emprestar', `❌ ${erro.erro}`, 'error');
+        }
+      } catch (erro) {
+        mostrarMensagem('emprestar', '❌ Erro ao realizar empréstimo', 'error');
+      }
+    }
+
+    async function carregarEmprestimos() {
+      try {
+        const response = await fetch(`${API_URL}/emprestimos`);
+        const emprestimos = await response.json();
+        const tbody = document.getElementById('tbody-emprestimos');
+
+        if (emprestimos.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>Nenhum empréstimo registrado</p></td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = emprestimos.map(emp => {
+          const dataEmprestimo = new Date(emp.dataEmprestimo).toLocaleDateString('pt-BR');
+          const devolucaoPrevista = new Date(emp.devolucaoPrevista).toLocaleDateString('pt-BR');
+          const statusClass = emp.status === 'ativo' ? 'status-ativo' : 'status-devolvido';
+          const statusTexto = emp.status === 'ativo' ? 'Ativo' : 'Devolvido';
+
+          return `
+            <tr>
+              <td><strong>${emp.tituloLivro}</strong></td>
+              <td>${emp.nomeUsuario}</td>
+              <td>${emp.emailUsuario}</td>
+              <td>${dataEmprestimo}</td>
+              <td>${devolucaoPrevista}</td>
+              <td><span class="${statusClass}">${statusTexto}</span></td>
+              <td>
+                ${emp.status === 'ativo' ? 
+                  `<button class="btn-small btn-success" onclick="devolverEmprestimo('${emp._id}')">Devolver</button>` 
+                  : '—'}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (erro) {
+        console.error('Erro ao carregar empréstimos:', erro);
+        mostrarMensagem('emprestimos', 'Erro ao carregar empréstimos', 'error');
+      }
+    }
+
+    async function devolverEmprestimo(id) {
+      try {
+        const response = await fetch(`${API_URL}/emprestimos/${id}/devolver`, {
+          method: 'PATCH'
+        });
+
+        if (response.ok) {
+          mostrarMensagem('emprestimos', '✅ Devolução registrada com sucesso!');
+          carregarEmprestimos();
+          carregarLivros();
+        } else {
+          const erro = await response.json();
+          mostrarMensagem('emprestimos', `❌ ${erro.erro}`, 'error');
+        }
+      } catch (erro) {
+        mostrarMensagem('emprestimos', '❌ Erro ao registrar devolução', 'error');
+      }
+    }
+
+    // Carregar dados iniciais
+    carregarLivros();
+  </script>
+</body>
+</html>
