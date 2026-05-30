@@ -8,8 +8,8 @@ Esta versao implementa emprestimo e devolucao de livros com transacoes ACID do M
 
 As funcoes principais estao em `src/Emprestimos.js`:
 
-- `registrarEmprestimo(livroId, usuarioNome)`: abre uma session, verifica disponibilidade, decrementa `exemplares_disponiveis`, cria um documento em `emprestimos` com status `ativo` e confirma a transaction. Em qualquer erro, a transaction e abortada.
-- `devolverLivro(emprestimoId)`: abre uma session, valida se o emprestimo esta `ativo`, marca como `devolvido`, registra `data_devolucao_real`, incrementa `exemplares_disponiveis` no livro e confirma a transaction. Em qualquer erro, a transaction e abortada.
+- `registrarEmprestimo(livroId, usuarioNome)`: abre uma session, inicia a transaction, verifica disponibilidade, decrementa `exemplares_disponiveis`, cria um documento em `emprestimos` com status `ativo` e chama `commitTransaction()`. Em qualquer erro, chama `abortTransaction()`.
+- `devolverLivro(emprestimoId)`: abre uma session, inicia a transaction, valida se o emprestimo esta `ativo`, marca como `devolvido`, registra `data_devolucao_real`, incrementa `exemplares_disponiveis` no livro e chama `commitTransaction()`. Em qualquer erro, chama `abortTransaction()`.
 
 Importante: transacoes MongoDB exigem replica set ou cluster sharded. Em desenvolvimento local, inicie o MongoDB como replica set antes de testar as rotas transacionais.
 
@@ -110,19 +110,21 @@ curl -X PATCH http://localhost:3000/emprestimos/ID_DO_EMPRESTIMO/devolver
 ## Fluxo da Transaction de Emprestimo
 
 1. Inicia uma session com `getClient().startSession()`.
-2. Executa `session.withTransaction(...)`.
+2. Executa `session.startTransaction()`.
 3. Busca o livro dentro da session.
 4. Se nao existir disponibilidade, lanca erro e a transaction e abortada.
 5. Decrementa `exemplares_disponiveis` usando filtro atomico `{ exemplares_disponiveis: { $gt: 0 } }`.
 6. Insere o emprestimo com status `ativo`.
-7. Confirma a transaction ao final.
+7. Confirma a transaction com `session.commitTransaction()`.
+8. Em qualquer erro, desfaz com `session.abortTransaction()`.
 
 ## Fluxo da Transaction de Devolucao
 
 1. Inicia uma session com `getClient().startSession()`.
-2. Executa `session.withTransaction(...)`.
+2. Executa `session.startTransaction()`.
 3. Busca o emprestimo dentro da session.
 4. Se o status nao for `ativo`, lanca erro e a transaction e abortada.
 5. Atualiza status para `devolvido` e registra `data_devolucao_real`.
 6. Incrementa `exemplares_disponiveis` no livro relacionado.
-7. Confirma a transaction ao final.
+7. Confirma a transaction com `session.commitTransaction()`.
+8. Em qualquer erro, desfaz com `session.abortTransaction()`.

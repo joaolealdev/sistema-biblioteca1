@@ -53,52 +53,57 @@ async function registrarEmprestimo(livroId, usuarioNome, dadosExtras = {}) {
   const session = getClient().startSession();
 
   try {
-    let emprestimoCriado;
+    session.startTransaction();
 
-    await session.withTransaction(async () => {
-      const { livros, emprestimos } = getCollections();
-      const livro = await livros.findOne({ _id: livroObjectId }, { session });
+    const { livros, emprestimos } = getCollections();
+    const livro = await livros.findOne({ _id: livroObjectId }, { session });
 
-      if (!livro) {
-        throw criarErro("Livro nao encontrado.", 404);
-      }
+    if (!livro) {
+      throw criarErro("Livro nao encontrado.", 404);
+    }
 
-      if (livro.exemplares_disponiveis <= 0) {
-        throw criarErro(`"${livro.titulo}" nao tem exemplares disponiveis.`, 400);
-      }
+    if (livro.exemplares_disponiveis <= 0) {
+      throw criarErro(`"${livro.titulo}" nao tem exemplares disponiveis.`, 400);
+    }
 
-      const atualizacaoLivro = await livros.updateOne(
-        { _id: livroObjectId, exemplares_disponiveis: { $gt: 0 } },
-        { $inc: { exemplares_disponiveis: -1 } },
-        { session },
-      );
+    const atualizacaoLivro = await livros.updateOne(
+      { _id: livroObjectId, exemplares_disponiveis: { $gt: 0 } },
+      { $inc: { exemplares_disponiveis: -1 } },
+      { session },
+    );
 
-      if (atualizacaoLivro.modifiedCount !== 1) {
-        throw criarErro("Nao foi possivel reservar o exemplar disponivel.", 409);
-      }
+    if (atualizacaoLivro.modifiedCount !== 1) {
+      throw criarErro("Nao foi possivel reservar o exemplar disponivel.", 409);
+    }
 
-      const dataEmprestimo = new Date();
-      const dataDevolucaoPrevista = new Date(dataEmprestimo);
-      dataDevolucaoPrevista.setDate(dataDevolucaoPrevista.getDate() + PRAZO_DEVOLUCAO_DIAS);
+    const dataEmprestimo = new Date();
+    const dataDevolucaoPrevista = new Date(dataEmprestimo);
+    dataDevolucaoPrevista.setDate(dataDevolucaoPrevista.getDate() + PRAZO_DEVOLUCAO_DIAS);
 
-      const novoEmprestimo = {
-        livro_id: livroObjectId,
-        usuario_nome: String(usuarioNome).trim(),
-        data_emprestimo: dataEmprestimo,
-        data_devolucao_prevista: dataDevolucaoPrevista,
-        status: "ativo",
-        titulo_livro: livro.titulo,
-      };
+    const novoEmprestimo = {
+      livro_id: livroObjectId,
+      usuario_nome: String(usuarioNome).trim(),
+      data_emprestimo: dataEmprestimo,
+      data_devolucao_prevista: dataDevolucaoPrevista,
+      status: "ativo",
+      titulo_livro: livro.titulo,
+    };
 
-      if (dadosExtras.emailUsuario || dadosExtras.email_usuario) {
-        novoEmprestimo.email_usuario = dadosExtras.emailUsuario ?? dadosExtras.email_usuario;
-      }
+    if (dadosExtras.emailUsuario || dadosExtras.email_usuario) {
+      novoEmprestimo.email_usuario = dadosExtras.emailUsuario ?? dadosExtras.email_usuario;
+    }
 
-      const resultado = await emprestimos.insertOne(novoEmprestimo, { session });
-      emprestimoCriado = { _id: resultado.insertedId, ...novoEmprestimo };
-    });
+    const resultado = await emprestimos.insertOne(novoEmprestimo, { session });
+    const emprestimoCriado = { _id: resultado.insertedId, ...novoEmprestimo };
 
+    await session.commitTransaction();
     return emprestimoCriado;
+  } catch (erro) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
+    throw erro;
   } finally {
     await session.endSession();
   }
@@ -109,57 +114,62 @@ async function devolverLivro(emprestimoId) {
   const session = getClient().startSession();
 
   try {
-    let emprestimoDevolvido;
+    session.startTransaction();
 
-    await session.withTransaction(async () => {
-      const { livros, emprestimos } = getCollections();
-      const emprestimo = await emprestimos.findOne(
-        { _id: emprestimoObjectId },
-        { session },
-      );
+    const { livros, emprestimos } = getCollections();
+    const emprestimo = await emprestimos.findOne(
+      { _id: emprestimoObjectId },
+      { session },
+    );
 
-      if (!emprestimo) {
-        throw criarErro("Emprestimo nao encontrado.", 404);
-      }
+    if (!emprestimo) {
+      throw criarErro("Emprestimo nao encontrado.", 404);
+    }
 
-      if (emprestimo.status !== "ativo") {
-        throw criarErro("Este emprestimo nao esta ativo.", 400);
-      }
+    if (emprestimo.status !== "ativo") {
+      throw criarErro("Este emprestimo nao esta ativo.", 400);
+    }
 
-      const dataDevolucaoReal = new Date();
-      const atualizacaoEmprestimo = await emprestimos.updateOne(
-        { _id: emprestimoObjectId, status: "ativo" },
-        {
-          $set: {
-            status: "devolvido",
-            data_devolucao_real: dataDevolucaoReal,
-          },
+    const dataDevolucaoReal = new Date();
+    const atualizacaoEmprestimo = await emprestimos.updateOne(
+      { _id: emprestimoObjectId, status: "ativo" },
+      {
+        $set: {
+          status: "devolvido",
+          data_devolucao_real: dataDevolucaoReal,
         },
-        { session },
-      );
+      },
+      { session },
+    );
 
-      if (atualizacaoEmprestimo.modifiedCount !== 1) {
-        throw criarErro("Nao foi possivel registrar a devolucao.", 409);
-      }
+    if (atualizacaoEmprestimo.modifiedCount !== 1) {
+      throw criarErro("Nao foi possivel registrar a devolucao.", 409);
+    }
 
-      const atualizacaoLivro = await livros.updateOne(
-        { _id: emprestimo.livro_id },
-        { $inc: { exemplares_disponiveis: 1 } },
-        { session },
-      );
+    const atualizacaoLivro = await livros.updateOne(
+      { _id: emprestimo.livro_id },
+      { $inc: { exemplares_disponiveis: 1 } },
+      { session },
+    );
 
-      if (atualizacaoLivro.modifiedCount !== 1) {
-        throw criarErro("Livro vinculado ao emprestimo nao encontrado.", 404);
-      }
+    if (atualizacaoLivro.modifiedCount !== 1) {
+      throw criarErro("Livro vinculado ao emprestimo nao encontrado.", 404);
+    }
 
-      emprestimoDevolvido = {
-        ...emprestimo,
-        status: "devolvido",
-        data_devolucao_real: dataDevolucaoReal,
-      };
-    });
+    const emprestimoDevolvido = {
+      ...emprestimo,
+      status: "devolvido",
+      data_devolucao_real: dataDevolucaoReal,
+    };
 
+    await session.commitTransaction();
     return emprestimoDevolvido;
+  } catch (erro) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
+    throw erro;
   } finally {
     await session.endSession();
   }

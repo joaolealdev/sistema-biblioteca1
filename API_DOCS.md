@@ -8,7 +8,7 @@ http://localhost:3000
 
 ## Observacao Sobre Transactions
 
-As rotas `POST /emprestimos` e `PATCH /emprestimos/:id/devolver` usam transacoes ACID do MongoDB via session e `withTransaction`.
+As rotas `POST /emprestimos` e `PATCH /emprestimos/:id/devolver` usam transacoes ACID do MongoDB via session, `startTransaction`, `commitTransaction` e `abortTransaction`.
 
 Para funcionar, o MongoDB precisa estar em replica set ou cluster sharded. Em servidor standalone, o MongoDB retorna erro informando que transactions nao sao suportadas.
 
