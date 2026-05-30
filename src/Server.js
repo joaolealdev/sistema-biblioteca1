@@ -6,10 +6,10 @@ const emprestimos = require("./Emprestimos");
 const app = express();
 app.use(express.json());
 
-// Servir arquivos estáticos
+// Servir arquivos estaticos
 app.use(express.static("src/public"));
 
-// CORS - permitir requisições do frontend
+// CORS - permitir requisicoes do frontend
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE");
@@ -28,14 +28,18 @@ app.get("/", (req, res) => {
 // Handler de erros global
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ erro: "Erro interno no servidor." });
+  res.status(err.statusCode || 500).json({
+    erro: err.statusCode ? err.message : "Erro interno no servidor.",
+  });
 });
 
 async function iniciar() {
   await conectar();
   app.listen(3000, () =>
-    console.log("🚀 Servidor rodando em http://localhost:3000"),
+    console.log("Servidor rodando em http://localhost:3000"),
   );
 }
 
-iniciar();
+iniciar().catch((erro) => {
+  console.error("Erro ao iniciar servidor:", erro);
+});

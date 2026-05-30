@@ -1,151 +1,77 @@
-# Documentação gerada com ajuda de IA
-# 📚 Sistema de Biblioteca
+# Sistema de Biblioteca
 
-Um sistema completo de gerenciamento de biblioteca desenvolvido com **Node.js**, **Express**, **MongoDB** e **Frontend Moderno**.
+API e frontend simples para gerenciamento de livros e emprestimos usando Node.js, Express e MongoDB.
 
-## 📋 Descrição
+## Atividade: Transactions no MongoDB
 
-O Sistema de Biblioteca é uma aplicação web que permite:
-- ✅ **Cadastro de Livros** - Adicionar e remover livros do acervo
-- ✅ **Gestão de Empréstimos** - Emprestar livros aos usuários com data de devolução prevista
-- ✅ **Registro de Devoluções** - Registrar devoluções e atualizar disponibilidade
-- ✅ **Visualização** - Interface moderna e responsiva para gerenciar todo o acervo
+Esta versao implementa emprestimo e devolucao de livros com transacoes ACID do MongoDB.
 
-## 🛠️ Tecnologias Utilizadas
+As funcoes principais estao em `src/Emprestimos.js`:
 
-### Backend
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web para APIs REST
-- **MongoDB** - Banco de dados NoSQL
-- **CORS** - Controle de acesso entre origens
+- `registrarEmprestimo(livroId, usuarioNome)`: abre uma session, verifica disponibilidade, decrementa `exemplares_disponiveis`, cria um documento em `emprestimos` com status `ativo` e confirma a transaction. Em qualquer erro, a transaction e abortada.
+- `devolverLivro(emprestimoId)`: abre uma session, valida se o emprestimo esta `ativo`, marca como `devolvido`, registra `data_devolucao_real`, incrementa `exemplares_disponiveis` no livro e confirma a transaction. Em qualquer erro, a transaction e abortada.
 
-### Frontend
-- **HTML5** - Estrutura
-- **CSS3** - Estilo responsivo com gradientes e animações
-- **JavaScript Vanilla** - Interatividade
-- **Font Awesome** - Ícones
-- **Fetch API** - Requisições HTTP
+Importante: transacoes MongoDB exigem replica set ou cluster sharded. Em desenvolvimento local, inicie o MongoDB como replica set antes de testar as rotas transacionais.
 
-## 📁 Estrutura do Projeto
+Exemplo local:
 
-```
-sistemaBiblioteca/
-├── src/
-│   ├── public/
-│   │   └── index.html          # Frontend da aplicação
-│   ├── db.js                   # Conexão com MongoDB
-│   ├── Livros.js              # Rotas de gerenciamento de livros
-│   ├── Emprestimos.js         # Rotas de empréstimos e devoluções
-│   └── Server.js              # Servidor principal Express
-├── seed.js                     # Script para popular banco com 20 livros
-├── package.json               # Dependências do projeto
-└── README.md                  # Este arquivo
-```
-
-## 🚀 Instalação
-
-### Pré-requisitos
-- Node.js (versão 14 ou superior)
-- MongoDB rodando localmente na porta 27017
-
-### Passos
-
-1. **Clone o repositório**
 ```bash
-git clone https://github.com/seu-usuario/sistemaBiblioteca.git
-cd sistemaBiblioteca
+mongod --dbpath ./data/db --replSet rs0
+mongosh --eval "rs.initiate()"
 ```
 
-2. **Instale as dependências**
-```bash
-npm install
-```
+## Schema das Collections
 
-3. **Certifique-se que MongoDB está rodando**
-```bash
-# Windows
-mongod
+### livros
 
-# Linux/Mac
-brew services start mongodb-community
-```
-
-4. **Popular o banco com 20 livros brasileiros (opcional)**
-```bash
-node seed.js
-```
-
-5. **Inicie o servidor**
-```bash
-npm start
-```
-
-6. **Acesse a aplicação**
-Abra seu navegador e visite: `http://localhost:3000`
-
-## 📖 Como Usar
-
-### 1️⃣ Aba Livros
-- **Adicionar Livro**: Preencha o formulário com título, autor, ISBN e quantidade
-- **Remover Livro**: Clique no botão "Remover" no card do livro
-- **Visualizar**: Todos os livros aparecem em cards com informações de disponibilidade
-
-### 2️⃣ Aba Emprestar
-- Selecione um livro disponível do dropdown
-- Preencha nome e email do usuário
-- Clique em "Emprestar Livro"
-- A devolução será prevista para 14 dias depois
-
-### 3️⃣ Aba Empréstimos
-- Visualize todos os empréstimos (ativos e devolvidos)
-- Clique em "Devolver" para registrar a devolução de um livro
-- O livro será marcado como devolvido e voltará ao acervo
-
-## 🗄️ Banco de Dados
-
-### Coleção: Livros
 ```javascript
 {
   _id: ObjectId,
   titulo: String,
   autor: String,
   isbn: String,
-  quantidade: Number,        // Total de exemplares
-  disponiveis: Number,       // Exemplares disponíveis
+  exemplares_total: Number,
+  exemplares_disponiveis: Number,
   criadoEm: Date
 }
 ```
 
-### Coleção: Empréstimos
+### emprestimos
+
 ```javascript
 {
   _id: ObjectId,
-  livroId: ObjectId,
-  tituloLivro: String,
-  nomeUsuario: String,
-  emailUsuario: String,
-  dataEmprestimo: Date,
-  devolucaoPrevista: Date,
-  dataDevolucao: Date (opcional),
-  status: String             // "ativo" ou "devolvido"
+  livro_id: ObjectId,
+  usuario_nome: String,
+  data_emprestimo: Date,
+  data_devolucao_prevista: Date,
+  data_devolucao_real: Date, // preenchido na devolucao
+  status: "ativo" | "devolvido"
 }
 ```
 
-## 🔌 API REST
+## Como Rodar
+
+```bash
+npm install
+npm run seed
+npm start
+```
+
+Acesse `http://localhost:3000`.
+
+## Endpoints
 
 ### Livros
 
-**GET /livros** - Listar todos os livros
-```bash
-curl http://localhost:3000/livros
-```
+- `GET /livros`
+- `GET /livros/:id`
+- `POST /livros`
+- `PUT /livros/:id`
+- `DELETE /livros/:id`
 
-**GET /livros/:id** - Buscar livro por ID
-```bash
-curl http://localhost:3000/livros/1234567890abcdef
-```
+Criar livro:
 
-**POST /livros** - Criar novo livro
 ```bash
 curl -X POST http://localhost:3000/livros \
   -H "Content-Type: application/json" \
@@ -153,146 +79,50 @@ curl -X POST http://localhost:3000/livros \
     "titulo": "Dom Casmurro",
     "autor": "Machado de Assis",
     "isbn": "978-8525051234",
-    "quantidade": 5
+    "exemplares_total": 5
   }'
 ```
 
-**PUT /livros/:id** - Atualizar livro
-```bash
-curl -X PUT http://localhost:3000/livros/1234567890abcdef \
-  -H "Content-Type: application/json" \
-  -d '{
-    "titulo": "Novo Título",
-    "autor": "Novo Autor",
-    "quantidade": 10
-  }'
-```
+### Emprestimos
 
-**DELETE /livros/:id** - Remover livro
-```bash
-curl -X DELETE http://localhost:3000/livros/1234567890abcdef
-```
+- `GET /emprestimos`
+- `GET /emprestimos/:id`
+- `POST /emprestimos`
+- `PATCH /emprestimos/:id/devolver`
 
-### Empréstimos
+Registrar emprestimo:
 
-**GET /emprestimos** - Listar empréstimos com filtro opcional
-```bash
-curl http://localhost:3000/emprestimos
-curl "http://localhost:3000/emprestimos?status=ativo"
-```
-
-**GET /emprestimos/:id** - Buscar empréstimo por ID
-```bash
-curl http://localhost:3000/emprestimos/1234567890abcdef
-```
-
-**POST /emprestimos** - Realizar empréstimo
 ```bash
 curl -X POST http://localhost:3000/emprestimos \
   -H "Content-Type: application/json" \
   -d '{
-    "livroId": "1234567890abcdef",
-    "nomeUsuario": "João Silva",
-    "emailUsuario": "joao@example.com"
+    "livro_id": "ID_DO_LIVRO",
+    "usuario_nome": "Maria Santos"
   }'
 ```
 
-**PATCH /emprestimos/:id/devolver** - Registrar devolução
-```bash
-curl -X PATCH http://localhost:3000/emprestimos/1234567890abcdef/devolver
-```
-
-## ✨ Recursos
-
-- 🎨 **Design Moderno** - Interface limpa com gradientes e animações suaves
-- 📱 **Responsivo** - Funciona em desktop, tablet e mobile
-- ⚡ **Validação** - Valida IDs de ObjectId antes de processar
-- 🔄 **Sincronização** - Atualização em tempo real da disponibilidade
-- 💾 **Persistência** - Todos os dados salvos no MongoDB
-- 🎯 **Intuitivo** - Interface amigável e fácil de usar
-
-## 📊 Dados de Exemplo
-
-O projeto vem com 20 clássicos da literatura brasileira:
-1. Dom Casmurro - Machado de Assis
-2. Memórias Póstumas de Brás Cubas - Machado de Assis
-3. Quincas Borba - Machado de Assis
-4. Grande Sertão: Veredas - Guimarães Rosa
-5. O Cortiço - Aluísio Azevedo
-6. Capitães da Areia - Jorge Amado
-7. Gabriela, Cravo e Canela - Jorge Amado
-8. Sagarana - Guimarães Rosa
-9. São Bernardo - Graciliano Ramos
-10. Vidas Secas - Graciliano Ramos
-11. Macunaíma - Mário de Andrade
-12. O Primo Basílio - Eça de Queiroz
-13. Iracema - José de Alencar
-14. O Guarani - José de Alencar
-15. Senhora - José de Alencar
-16. O Seminarista - Bernardo Guimarães
-17. O Encoberto - Autran Dourado
-18. A Hora da Estrela - Clarice Lispector
-19. A Paixão Segundo G.H. - Clarice Lispector
-20. Cumplicidade - Fernando Pessoa
-
-## 🐛 Tratamento de Erros
-
-O sistema trata os seguintes erros:
-
-- **ID Inválido** - Retorna erro 400 se o ObjectId for inválido
-- **Livro não encontrado** - Retorna erro 404
-- **ISBN duplicado** - Retorna erro 409 ao tentar cadastrar ISBN já existente
-- **Livro indisponível** - Retorna erro 400 ao tentar emprestar livro sem exemplares
-- **Exemplares emprestados** - Não permite remover livro com empréstimos ativo
-
-## 📝 Scripts Disponíveis
+Registrar devolucao:
 
 ```bash
-# Iniciar servidor
-npm start
-
-# Popular banco com 20 livros
-node seed.js
+curl -X PATCH http://localhost:3000/emprestimos/ID_DO_EMPRESTIMO/devolver
 ```
 
-## 🎓 Propósito Educacional
+## Fluxo da Transaction de Emprestimo
 
-Este projeto foi desenvolvido como atividade educacional para demonstrar:
-- Arquitetura REST API
-- CRUD completo em MongoDB
-- Frontend com Fetch API
-- Validação de dados
-- Tratamento de erros
-- Design responsivo
+1. Inicia uma session com `getClient().startSession()`.
+2. Executa `session.withTransaction(...)`.
+3. Busca o livro dentro da session.
+4. Se nao existir disponibilidade, lanca erro e a transaction e abortada.
+5. Decrementa `exemplares_disponiveis` usando filtro atomico `{ exemplares_disponiveis: { $gt: 0 } }`.
+6. Insere o emprestimo com status `ativo`.
+7. Confirma a transaction ao final.
 
-## 📦 Dependências
+## Fluxo da Transaction de Devolucao
 
-```json
-{
-  "express": "^4.18.2",
-  "mongodb": "^5.8.0"
-}
-```
-
-## 📄 Licença
-
-Este projeto é de código aberto e disponível sob a licença ISC.
-
-## 👨‍💻 Autor
-
-Desenvolvido como projeto de estudo e prática de desenvolvimento full-stack.
-
-## 🤝 Contribuições
-
-Contribuições são bem-vindas! Sinta-se livre para:
-- Reportar bugs
-- Sugerir melhorias
-- Enviar pull requests
-
-## 📞 Suporte
-
-Para dúvidas ou sugestões sobre o projeto, entre em contato ou abra uma issue no repositório.
-
----
-
-**Desenvolvido com ❤️ usando Node.js + MongoDB + JavaScript**
+1. Inicia uma session com `getClient().startSession()`.
+2. Executa `session.withTransaction(...)`.
+3. Busca o emprestimo dentro da session.
+4. Se o status nao for `ativo`, lanca erro e a transaction e abortada.
+5. Atualiza status para `devolvido` e registra `data_devolucao_real`.
+6. Incrementa `exemplares_disponiveis` no livro relacionado.
+7. Confirma a transaction ao final.

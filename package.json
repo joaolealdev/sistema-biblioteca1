@@ -5,7 +5,8 @@
   "main": "src/Server.js",
   "scripts": {
     "start": "node src/Server.js",
-    "dev": "node src/Server.js"
+    "dev": "node src/Server.js",
+    "seed": "node seed.js"
   },
   "keywords": ["biblioteca", "livros", "emprestimos"],
   "author": "",

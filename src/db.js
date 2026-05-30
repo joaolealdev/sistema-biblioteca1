@@ -4,17 +4,23 @@ const MONGO_URI = "mongodb://localhost:27017";
 const DB_NAME = "biblioteca";
 
 let db;
+let client;
 
 async function conectar() {
-  const client = new MongoClient(MONGO_URI);
+  client = new MongoClient(MONGO_URI);
   await client.connect();
   db = client.db(DB_NAME);
-  console.log(`✅ MongoDB conectado: ${DB_NAME}`);
+  console.log(`MongoDB conectado: ${DB_NAME}`);
 }
 
 function getDb() {
-  if (!db) throw new Error("Banco não conectado. Chame conectar() primeiro.");
+  if (!db) throw new Error("Banco nao conectado. Chame conectar() primeiro.");
   return db;
 }
 
-module.exports = { conectar, getDb };
+function getClient() {
+  if (!client) throw new Error("MongoClient nao conectado. Chame conectar() primeiro.");
+  return client;
+}
+
+module.exports = { conectar, getDb, getClient };
