@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/Server.js",
     "dev": "node src/Server.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "mongo:rs": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"New-Item -ItemType Directory -Force -Path data/db | Out-Null; mongod --dbpath data/db --replSet rs0 --bind_ip localhost\"",
+    "mongo:init": "mongosh --eval \"rs.initiate()\"",
+    "mongo:status": "mongosh --eval \"rs.status()\""
   },
   "keywords": ["biblioteca", "livros", "emprestimos"],
   "author": "",

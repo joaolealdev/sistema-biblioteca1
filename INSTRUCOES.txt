@@ -7,9 +7,14 @@ SISTEMA DE BIBLIOTECA - INSTRUCOES RAPIDAS
 2. Rodar MongoDB com suporte a transactions
    O MongoDB precisa estar em replica set ou cluster sharded.
 
-   Exemplo local:
-   mongod --dbpath ./data/db --replSet rs0
-   mongosh --eval "rs.initiate()"
+   Terminal 1:
+   npm run mongo:rs
+
+   Terminal 2, apenas uma vez:
+   npm run mongo:init
+
+   Se o MongoDB ja estiver rodando como servico standalone na porta 27017,
+   pare esse servico antes de usar npm run mongo:rs.
 
 3. Popular banco
    npm run seed

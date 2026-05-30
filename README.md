@@ -13,12 +13,19 @@ As funcoes principais estao em `src/Emprestimos.js`:
 
 Importante: transacoes MongoDB exigem replica set ou cluster sharded. Em desenvolvimento local, inicie o MongoDB como replica set antes de testar as rotas transacionais.
 
-Exemplo local:
+No Windows, o caminho mais simples dentro deste projeto e:
 
 ```bash
-mongod --dbpath ./data/db --replSet rs0
-mongosh --eval "rs.initiate()"
+npm run mongo:rs
 ```
+
+Deixe esse terminal aberto. Em outro terminal, rode uma unica vez:
+
+```bash
+npm run mongo:init
+```
+
+Se voce ja tiver o MongoDB rodando como servico standalone na porta `27017`, pare esse servico antes de rodar `npm run mongo:rs`, senao a porta estara ocupada.
 
 ## Schema das Collections
 
@@ -54,6 +61,13 @@ mongosh --eval "rs.initiate()"
 
 ```bash
 npm install
+npm run mongo:rs
+```
+
+Em outro terminal:
+
+```bash
+npm run mongo:init
 npm run seed
 npm start
 ```

@@ -12,6 +12,18 @@ As rotas `POST /emprestimos` e `PATCH /emprestimos/:id/devolver` usam transacoes
 
 Para funcionar, o MongoDB precisa estar em replica set ou cluster sharded. Em servidor standalone, o MongoDB retorna erro informando que transactions nao sao suportadas.
 
+No desenvolvimento local, use:
+
+```bash
+npm run mongo:rs
+```
+
+Em outro terminal, rode uma vez:
+
+```bash
+npm run mongo:init
+```
+
 ## Livros
 
 ### GET /livros

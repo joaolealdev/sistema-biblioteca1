@@ -25,9 +25,25 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
 
+function erroReplicaSetTransacao(err) {
+  return (
+    err.code === 20 &&
+    typeof err.message === "string" &&
+    err.message.includes("Transaction numbers are only allowed")
+  );
+}
+
 // Handler de erros global
 app.use((err, req, res, next) => {
   console.error(err);
+
+  if (erroReplicaSetTransacao(err)) {
+    return res.status(503).json({
+      erro:
+        "Transacoes do MongoDB exigem replica set. Pare o MongoDB standalone e inicie com: npm run mongo:rs. Em outro terminal, rode uma vez: npm run mongo:init.",
+    });
+  }
+
   res.status(err.statusCode || 500).json({
     erro: err.statusCode ? err.message : "Erro interno no servidor.",
   });
