@@ -13,8 +13,8 @@ SISTEMA DE BIBLIOTECA - INSTRUCOES RAPIDAS
    Terminal 2, apenas uma vez:
    npm run mongo:init
 
-   Se o MongoDB ja estiver rodando como servico standalone na porta 27017,
-   pare esse servico antes de usar npm run mongo:rs.
+   O replica set local usa a porta 27018 para nao conflitar com o
+   MongoDB instalado como servico na porta padrao 27017.
 
 3. Popular banco
    npm run seed

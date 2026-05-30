@@ -24,6 +24,8 @@ Em outro terminal, rode uma vez:
 npm run mongo:init
 ```
 
+Esses scripts usam a porta `27018` para nao conflitar com o MongoDB instalado como servico na porta padrao `27017`.
+
 ## Livros
 
 ### GET /livros

@@ -7,9 +7,9 @@
     "start": "node src/Server.js",
     "dev": "node src/Server.js",
     "seed": "node seed.js",
-    "mongo:rs": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"New-Item -ItemType Directory -Force -Path data/db | Out-Null; mongod --dbpath data/db --replSet rs0 --bind_ip localhost\"",
-    "mongo:init": "mongosh --eval \"rs.initiate()\"",
-    "mongo:status": "mongosh --eval \"rs.status()\""
+    "mongo:rs": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"New-Item -ItemType Directory -Force -Path data/rs27018 | Out-Null; mongod --dbpath data/rs27018 --replSet rs0 --bind_ip localhost --port 27018\"",
+    "mongo:init": "mongosh mongodb://localhost:27018 --eval \"try { rs.status() } catch (e) { rs.initiate() }\"",
+    "mongo:status": "mongosh mongodb://localhost:27018 --eval \"rs.status()\""
   },
   "keywords": ["biblioteca", "livros", "emprestimos"],
   "author": "",

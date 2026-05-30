@@ -40,7 +40,7 @@ app.use((err, req, res, next) => {
   if (erroReplicaSetTransacao(err)) {
     return res.status(503).json({
       erro:
-        "Transacoes do MongoDB exigem replica set. Pare o MongoDB standalone e inicie com: npm run mongo:rs. Em outro terminal, rode uma vez: npm run mongo:init.",
+        "Transacoes do MongoDB exigem replica set. Inicie o replica set local com: npm run mongo:rs. Em outro terminal, rode uma vez: npm run mongo:init.",
     });
   }
 

@@ -25,7 +25,7 @@ Deixe esse terminal aberto. Em outro terminal, rode uma unica vez:
 npm run mongo:init
 ```
 
-Se voce ja tiver o MongoDB rodando como servico standalone na porta `27017`, pare esse servico antes de rodar `npm run mongo:rs`, senao a porta estara ocupada.
+O script usa a porta `27018` para nao conflitar com um MongoDB instalado como servico na porta padrao `27017`.
 
 ## Schema das Collections
 
