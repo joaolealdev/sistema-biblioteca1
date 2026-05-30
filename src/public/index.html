@@ -3,612 +3,1272 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 Sistema de Biblioteca</title>
+  <title>Sistema de Biblioteca</title>
   <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-subtle: #f9fafb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d9dee7;
+      --line-strong: #c7ceda;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --success: #0f766e;
+      --success-soft: #ccfbf1;
+      --danger: #b42318;
+      --danger-soft: #fee4e2;
+      --warning: #b45309;
+      --warning-soft: #fef3c7;
+      --shadow: 0 18px 45px rgba(31, 41, 55, 0.08);
+      --radius: 8px;
+      --sidebar-width: 248px;
+    }
+
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
       min-height: 100vh;
-      padding: 20px;
+      background:
+        linear-gradient(180deg, rgba(37, 99, 235, 0.08), transparent 320px),
+        var(--bg);
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      letter-spacing: 0;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    header {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    header h1 {
-      color: #667eea;
-      font-size: 2.5em;
-      margin-bottom: 10px;
-    }
-
-    header p {
-      color: #666;
-      font-size: 1.1em;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      background: white;
-      border: 2px solid #667eea;
-      color: #667eea;
-      padding: 12px 25px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1em;
-      font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .tab-btn:hover {
-      background: #667eea;
-      color: white;
-    }
-
-    .tab-btn.active {
-      background: #667eea;
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 600;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      font-size: 1em;
-      transition: border-color 0.3s;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .form-row .form-group {
-      margin-bottom: 0;
+    button,
+    input,
+    select {
+      font: inherit;
     }
 
     button {
-      background: #667eea;
-      color: white;
-      padding: 12px 30px;
-      border: none;
-      border-radius: 6px;
+      border: 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(18px);
+      padding: 24px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 48px;
+      margin-bottom: 28px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.03rem;
+      line-height: 1.15;
+      font-weight: 760;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 520;
+      margin-top: 3px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
       cursor: pointer;
-      font-size: 1em;
-      font-weight: 600;
-      transition: background 0.3s;
+      font-weight: 650;
+      text-align: left;
+      transition: background 160ms ease, color 160ms ease;
     }
 
-    button:hover {
-      background: #764ba2;
+    .nav-button:hover {
+      background: var(--surface-subtle);
+      color: var(--text);
     }
 
-    .table-container {
+    .nav-button.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .main {
+      min-width: 0;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 0 auto 22px;
+      max-width: 1180px;
+    }
+
+    .page-title h2 {
+      margin: 0;
+      font-size: 1.55rem;
+      font-weight: 780;
+      line-height: 1.2;
+    }
+
+    .page-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 680;
+      white-space: nowrap;
+    }
+
+    .content {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      min-height: 104px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      font-weight: 680;
+    }
+
+    .metric-value {
+      margin-top: 12px;
+      font-size: 1.8rem;
+      line-height: 1;
+      font-weight: 780;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .workspace.single {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 62px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-subtle);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 0.96rem;
+      font-weight: 760;
+    }
+
+    .panel-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      color: #344054;
+      font-size: 0.82rem;
+      font-weight: 720;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      padding: 0 12px;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13);
+      outline: none;
+    }
+
+    .field-hint {
+      min-height: 18px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 720;
+      white-space: nowrap;
+      transition: background 150ms ease, color 150ms ease, border-color 150ms ease, transform 150ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+      transform: none;
+    }
+
+    .button-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .button-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .button-secondary {
+      border: 1px solid var(--line-strong);
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .button-danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .button-success {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .icon-button {
+      width: 36px;
+      min-height: 36px;
+      padding: 0;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--muted);
+    }
+
+    .table-wrap {
       overflow-x: auto;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      min-width: 720px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 13px 16px;
+      text-align: left;
+      vertical-align: middle;
     }
 
     th {
-      background: #667eea;
-      color: white;
-      padding: 15px;
-      text-align: left;
-      font-weight: 600;
+      background: var(--surface-subtle);
+      color: #475467;
+      font-size: 0.75rem;
+      font-weight: 780;
+      text-transform: uppercase;
     }
 
     td {
-      padding: 15px;
-      border-bottom: 1px solid #eee;
+      color: #344054;
+      font-size: 0.9rem;
     }
 
-    tr:hover {
-      background: #f5f5f5;
+    tbody tr:hover {
+      background: #fbfcfe;
     }
 
-    .status-ativo {
-      background: #d4edda;
-      color: #155724;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-weight: 600;
+    .strong {
+      color: var(--text);
+      font-weight: 760;
     }
 
-    .status-devolvido {
-      background: #cce5ff;
-      color: #004085;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-weight: 600;
+    .muted {
+      color: var(--muted);
     }
 
-    .btn-small {
-      padding: 8px 15px;
-      font-size: 0.9em;
-      margin: 0 5px;
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 780;
+      white-space: nowrap;
     }
 
-    .btn-danger {
-      background: #dc3545;
+    .badge-success {
+      background: var(--success-soft);
+      color: var(--success);
     }
 
-    .btn-danger:hover {
-      background: #c82333;
+    .badge-danger {
+      background: var(--danger-soft);
+      color: var(--danger);
     }
 
-    .btn-success {
-      background: #28a745;
-    }
-
-    .btn-success:hover {
-      background: #218838;
+    .badge-warning {
+      background: var(--warning-soft);
+      color: var(--warning);
     }
 
     .message {
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
       display: none;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      font-weight: 650;
     }
 
     .message.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
       display: block;
+      background: var(--success-soft);
+      color: var(--success);
     }
 
     .message.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
       display: block;
+      background: var(--danger-soft);
+      color: var(--danger);
     }
 
-    .empty-state {
+    .empty {
+      display: grid;
+      place-items: center;
+      min-height: 180px;
+      color: var(--muted);
       text-align: center;
-      padding: 40px;
-      color: #999;
+      padding: 28px;
     }
 
-    .empty-state p {
-      font-size: 1.2em;
+    .empty strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 1rem;
     }
 
-    @media (max-width: 768px) {
-      .form-row {
+    .book-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .book-option {
+      display: grid;
+      gap: 6px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-subtle);
+    }
+
+    .book-option-title {
+      font-weight: 760;
+    }
+
+    .book-option-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    @media (max-width: 980px) {
+      .app {
         grid-template-columns: 1fr;
       }
 
-      header h1 {
-        font-size: 1.8em;
+      .sidebar {
+        position: static;
+        height: auto;
+        display: grid;
+        gap: 14px;
+        padding: 16px;
       }
 
-      .tabs {
+      .brand {
+        margin-bottom: 0;
+      }
+
+      .nav {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .nav-button {
+        width: auto;
+        flex: 0 0 auto;
+      }
+
+      .main {
+        padding: 20px 16px;
+      }
+
+      .topbar {
         flex-direction: column;
       }
 
-      .tab-btn {
-        width: 100%;
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
       table {
-        font-size: 0.9em;
-      }
-
-      th, td {
-        padding: 10px;
+        min-width: 680px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>📚 Sistema de Biblioteca</h1>
-      <p>Gerenciamento de livros e empréstimos</p>
-    </header>
+  <svg aria-hidden="true" class="sr-only">
+    <symbol id="icon-book" viewBox="0 0 24 24">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path>
+    </symbol>
+    <symbol id="icon-send" viewBox="0 0 24 24">
+      <path d="m22 2-7 20-4-9-9-4Z"></path>
+      <path d="M22 2 11 13"></path>
+    </symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24">
+      <path d="M8 6h13"></path>
+      <path d="M8 12h13"></path>
+      <path d="M8 18h13"></path>
+      <path d="M3 6h.01"></path>
+      <path d="M3 12h.01"></path>
+      <path d="M3 18h.01"></path>
+    </symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14"></path>
+      <path d="M5 12h14"></path>
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+      <path d="M3 6h18"></path>
+      <path d="M8 6V4h8v2"></path>
+      <path d="M19 6l-1 14H6L5 6"></path>
+      <path d="M10 11v6"></path>
+      <path d="M14 11v6"></path>
+    </symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24">
+      <path d="M21 12a9 9 0 0 0-15-6.7L3 8"></path>
+      <path d="M3 3v5h5"></path>
+      <path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path>
+      <path d="M21 21v-5h-5"></path>
+    </symbol>
+    <symbol id="icon-return" viewBox="0 0 24 24">
+      <path d="m9 14-4-4 4-4"></path>
+      <path d="M5 10h11a4 4 0 0 1 0 8h-1"></path>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <path d="m20 6-11 11-5-5"></path>
+    </symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    </symbol>
+  </svg>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="abrirAba('livros')">📖 Livros</button>
-      <button class="tab-btn" onclick="abrirAba('emprestar')">📤 Emprestar</button>
-      <button class="tab-btn" onclick="abrirAba('emprestimos')">📋 Empréstimos</button>
-    </div>
-
-    <!-- Aba Livros -->
-    <div id="livros" class="tab-content active">
-      <div id="mensagem-livros" class="message"></div>
-      
-      <h2>Cadastrar Novo Livro</h2>
-      <form onsubmit="adicionarLivro(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="titulo">Título</label>
-            <input type="text" id="titulo" required>
-          </div>
-          <div class="form-group">
-            <label for="autor">Autor</label>
-            <input type="text" id="autor" required>
-          </div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg class="icon"><use href="#icon-book"></use></svg>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="isbn">ISBN</label>
-            <input type="text" id="isbn" required>
-          </div>
-          <div class="form-group">
-            <label for="quantidade">Quantidade</label>
-            <input type="number" id="quantidade" min="1" required>
-          </div>
+        <div>
+          <h1>Sistema de Biblioteca</h1>
+          <span>Acervo e emprestimos</span>
         </div>
-        <button type="submit">Adicionar Livro</button>
-      </form>
-
-      <h2 style="margin-top: 40px;">Livros Cadastrados</h2>
-      <div class="table-container">
-        <table id="tabela-livros">
-          <thead>
-            <tr>
-              <th>Título</th>
-              <th>Autor</th>
-              <th>ISBN</th>
-              <th>Total</th>
-              <th>Disponíveis</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-livros">
-            <tr><td colspan="6" class="empty-state"><p>Carregando livros...</p></td></tr>
-          </tbody>
-        </table>
       </div>
-    </div>
 
-    <!-- Aba Emprestar -->
-    <div id="emprestar" class="tab-content">
-      <div id="mensagem-emprestar" class="message"></div>
-      
-      <h2>Realizar Empréstimo</h2>
-      <form onsubmit="realizarEmprestimo(event)">
-        <div class="form-group">
-          <label for="livro-select">Selecionar Livro</label>
-          <select id="livro-select" required onchange="atualizarDisponibilidade()">
-            <option value="">-- Escolha um livro --</option>
-          </select>
-          <small id="disponibilidade-info" style="color: #666; margin-top: 5px; display: block;"></small>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="nome-usuario">Nome do Usuário</label>
-            <input type="text" id="nome-usuario" required>
-          </div>
-          <div class="form-group">
-            <label for="email-usuario">Email</label>
-            <input type="email" id="email-usuario" required>
-          </div>
-        </div>
-        <button type="submit">Emprestar Livro</button>
-      </form>
-    </div>
+      <nav class="nav" aria-label="Navegacao principal">
+        <button class="nav-button active" type="button" data-tab="livros">
+          <svg class="icon"><use href="#icon-book"></use></svg>
+          Livros
+        </button>
+        <button class="nav-button" type="button" data-tab="emprestar">
+          <svg class="icon"><use href="#icon-send"></use></svg>
+          Emprestar
+        </button>
+        <button class="nav-button" type="button" data-tab="emprestimos">
+          <svg class="icon"><use href="#icon-list"></use></svg>
+          Emprestimos
+        </button>
+      </nav>
+    </aside>
 
-    <!-- Aba Empréstimos -->
-    <div id="emprestimos" class="tab-content">
-      <div id="mensagem-emprestimos" class="message"></div>
-      
-      <h2>Empréstimos Ativos</h2>
-      <div class="table-container">
-        <table id="tabela-emprestimos">
-          <thead>
-            <tr>
-              <th>Livro</th>
-              <th>Usuário</th>
-              <th>Email</th>
-              <th>Data Empréstimo</th>
-              <th>Devolução Prevista</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-emprestimos">
-            <tr><td colspan="7" class="empty-state"><p>Carregando empréstimos...</p></td></tr>
-          </tbody>
-        </table>
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <h2 id="page-title">Livros</h2>
+          <p id="page-subtitle">Gerencie o acervo e acompanhe a disponibilidade.</p>
+        </div>
+        <div class="status-pill" id="connection-status">
+          <svg class="icon"><use href="#icon-check"></use></svg>
+          API pronta
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="metrics" aria-label="Resumo do sistema">
+          <article class="metric">
+            <div class="metric-label">
+              <svg class="icon"><use href="#icon-book"></use></svg>
+              Livros
+            </div>
+            <div class="metric-value" id="metric-livros">0</div>
+          </article>
+          <article class="metric">
+            <div class="metric-label">
+              <svg class="icon"><use href="#icon-check"></use></svg>
+              Disponiveis
+            </div>
+            <div class="metric-value" id="metric-disponiveis">0</div>
+          </article>
+          <article class="metric">
+            <div class="metric-label">
+              <svg class="icon"><use href="#icon-send"></use></svg>
+              Ativos
+            </div>
+            <div class="metric-value" id="metric-ativos">0</div>
+          </article>
+          <article class="metric">
+            <div class="metric-label">
+              <svg class="icon"><use href="#icon-users"></use></svg>
+              Usuarios
+            </div>
+            <div class="metric-value" id="metric-usuarios">0</div>
+          </article>
+        </section>
+
+        <section id="livros" class="tab-panel active">
+          <div class="workspace">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Novo livro</h3>
+                  <p class="panel-subtitle">Titulo, autor, ISBN e exemplares.</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="mensagem-livros" class="message"></div>
+                <form class="form" id="form-livro">
+                  <div class="field">
+                    <label for="titulo">Titulo</label>
+                    <input type="text" id="titulo" autocomplete="off" required>
+                  </div>
+                  <div class="field">
+                    <label for="autor">Autor</label>
+                    <input type="text" id="autor" autocomplete="off" required>
+                  </div>
+                  <div class="field">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" autocomplete="off" required>
+                  </div>
+                  <div class="field">
+                    <label for="quantidade">Exemplares</label>
+                    <input type="number" id="quantidade" min="1" step="1" required>
+                  </div>
+                  <div class="button-row">
+                    <button class="button button-primary" type="submit">
+                      <svg class="icon"><use href="#icon-plus"></use></svg>
+                      Adicionar
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Acervo</h3>
+                  <p class="panel-subtitle" id="livros-count">Carregando livros...</p>
+                </div>
+                <button class="button icon-button" type="button" id="refresh-livros" title="Atualizar livros" aria-label="Atualizar livros">
+                  <svg class="icon"><use href="#icon-refresh"></use></svg>
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Titulo</th>
+                      <th>Autor</th>
+                      <th>ISBN</th>
+                      <th>Total</th>
+                      <th>Disponiveis</th>
+                      <th>Acoes</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-livros"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="emprestar" class="tab-panel">
+          <div class="workspace">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Registrar emprestimo</h3>
+                  <p class="panel-subtitle">A transaction reserva o exemplar.</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="mensagem-emprestar" class="message"></div>
+                <form class="form" id="form-emprestimo">
+                  <div class="field">
+                    <label for="livro-select">Livro</label>
+                    <select id="livro-select" required>
+                      <option value="">Selecione um livro</option>
+                    </select>
+                    <div class="field-hint" id="disponibilidade-info"></div>
+                  </div>
+                  <div class="field">
+                    <label for="nome-usuario">Usuario</label>
+                    <input type="text" id="nome-usuario" autocomplete="name" required>
+                  </div>
+                  <div class="field">
+                    <label for="email-usuario">Email</label>
+                    <input type="email" id="email-usuario" autocomplete="email">
+                  </div>
+                  <div class="button-row">
+                    <button class="button button-primary" type="submit">
+                      <svg class="icon"><use href="#icon-send"></use></svg>
+                      Emprestar
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Disponiveis para emprestimo</h3>
+                  <p class="panel-subtitle" id="disponiveis-count">Carregando disponibilidade...</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="book-list" id="lista-disponiveis"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="emprestimos" class="tab-panel">
+          <div class="workspace single">
+            <div class="panel">
+              <div class="panel-header">
+                <div>
+                  <h3 class="panel-title">Historico de emprestimos</h3>
+                  <p class="panel-subtitle" id="emprestimos-count">Carregando emprestimos...</p>
+                </div>
+                <button class="button icon-button" type="button" id="refresh-emprestimos" title="Atualizar emprestimos" aria-label="Atualizar emprestimos">
+                  <svg class="icon"><use href="#icon-refresh"></use></svg>
+                </button>
+              </div>
+              <div id="mensagem-emprestimos" class="message" style="margin: 18px 18px 0;"></div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Livro</th>
+                      <th>Usuario</th>
+                      <th>Email</th>
+                      <th>Emprestimo</th>
+                      <th>Prevista</th>
+                      <th>Status</th>
+                      <th>Acoes</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-emprestimos"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   </div>
 
   <script>
-    const API_URL = 'http://localhost:3000';
+    const API_URL = "";
+    const state = {
+      livros: [],
+      emprestimos: [],
+      activeTab: "livros",
+    };
 
-    function abrirAba(nomeAba) {
-      // Esconder todas as abas
-      document.querySelectorAll('.tab-content').forEach(aba => {
-        aba.classList.remove('active');
+    const pageCopy = {
+      livros: {
+        title: "Livros",
+        subtitle: "Gerencie o acervo e acompanhe a disponibilidade.",
+      },
+      emprestar: {
+        title: "Emprestar",
+        subtitle: "Registre emprestimos com seguranca transacional.",
+      },
+      emprestimos: {
+        title: "Emprestimos",
+        subtitle: "Acompanhe ativos, devolvidos e prazos previstos.",
+      },
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+    function icon(name) {
+      return `<svg class="icon"><use href="#icon-${name}"></use></svg>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "-";
+
+      return date.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       });
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
+    }
 
-      // Mostrar aba selecionada
-      document.getElementById(nomeAba).classList.add('active');
-      event.target.classList.add('active');
+    function getTotal(livro) {
+      return livro.exemplares_total ?? livro.quantidade ?? 0;
+    }
 
-      // Carregar dados específicos da aba
-      if (nomeAba === 'livros') {
-        carregarLivros();
-      } else if (nomeAba === 'emprestar') {
-        carregarLivrosDisponiveisPara();
-      } else if (nomeAba === 'emprestimos') {
-        carregarEmprestimos();
+    function getDisponiveis(livro) {
+      return livro.exemplares_disponiveis ?? livro.disponiveis ?? 0;
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(`${API_URL}${path}`, options);
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(payload.erro || "Nao foi possivel concluir a operacao.");
       }
+
+      return payload;
     }
 
-    function mostrarMensagem(abaId, mensagem, tipo = 'success') {
-      const elemento = document.getElementById(`mensagem-${abaId}`);
-      elemento.textContent = mensagem;
-      elemento.className = `message ${tipo}`;
-      setTimeout(() => {
-        elemento.className = 'message';
-      }, 5000);
+    function setStatus(text, type = "ready") {
+      const status = $("#connection-status");
+      const statusIcon = type === "error" ? "refresh" : "check";
+      status.innerHTML = `${icon(statusIcon)} ${escapeHtml(text)}`;
+      status.style.color = type === "error" ? "var(--danger)" : "var(--muted)";
     }
 
-    // ========== LIVROS ==========
-    async function carregarLivros() {
-      try {
-        const response = await fetch(`${API_URL}/livros`);
-        const livros = await response.json();
-        const tbody = document.getElementById('tbody-livros');
+    function mostrarMensagem(area, mensagem, tipo = "success") {
+      const element = $(`#mensagem-${area}`);
+      if (!element) return;
 
-        if (livros.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>Nenhum livro cadastrado</p></td></tr>';
-          return;
-        }
+      element.textContent = mensagem;
+      element.className = `message ${tipo}`;
 
-        tbody.innerHTML = livros.map(livro => `
+      window.clearTimeout(element.dataset.timer);
+      element.dataset.timer = window.setTimeout(() => {
+        element.className = "message";
+        element.textContent = "";
+      }, 5200);
+    }
+
+    function emptyRow(colspan, title, subtitle) {
+      return `
+        <tr>
+          <td colspan="${colspan}">
+            <div class="empty">
+              <div>
+                <strong>${escapeHtml(title)}</strong>
+                <span>${escapeHtml(subtitle)}</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderMetrics() {
+      const totalLivros = state.livros.length;
+      const disponiveis = state.livros.reduce((sum, livro) => sum + Number(getDisponiveis(livro)), 0);
+      const ativos = state.emprestimos.filter((emprestimo) => emprestimo.status === "ativo").length;
+      const usuarios = new Set(
+        state.emprestimos
+          .map((emprestimo) => emprestimo.usuario_nome ?? emprestimo.nomeUsuario)
+          .filter(Boolean),
+      ).size;
+
+      $("#metric-livros").textContent = totalLivros;
+      $("#metric-disponiveis").textContent = disponiveis;
+      $("#metric-ativos").textContent = ativos;
+      $("#metric-usuarios").textContent = usuarios;
+    }
+
+    function renderLivros() {
+      const tbody = $("#tbody-livros");
+      $("#livros-count").textContent = `${state.livros.length} livro(s) cadastrados`;
+
+      if (state.livros.length === 0) {
+        tbody.innerHTML = emptyRow(6, "Nenhum livro cadastrado", "Adicione o primeiro livro do acervo.");
+        renderDisponiveis();
+        renderMetrics();
+        return;
+      }
+
+      tbody.innerHTML = state.livros.map((livro) => {
+        const disponiveis = Number(getDisponiveis(livro));
+        const total = Number(getTotal(livro));
+        const badgeClass = disponiveis > 0 ? "badge-success" : "badge-danger";
+        const disponibilidade = `${disponiveis}/${total}`;
+
+        return `
           <tr>
-            <td><strong>${livro.titulo}</strong></td>
-            <td>${livro.autor}</td>
-            <td>${livro.isbn}</td>
-            <td>${livro.quantidade}</td>
-            <td><strong style="color: ${livro.disponiveis > 0 ? '#28a745' : '#dc3545'}">${livro.disponiveis}</strong></td>
             <td>
-              <button class="btn-small btn-danger" onclick="deletarLivro('${livro._id}')">Remover</button>
+              <div class="strong">${escapeHtml(livro.titulo)}</div>
+              <div class="muted">${escapeHtml(livro._id)}</div>
+            </td>
+            <td>${escapeHtml(livro.autor)}</td>
+            <td>${escapeHtml(livro.isbn)}</td>
+            <td>${total}</td>
+            <td><span class="badge ${badgeClass}">${disponibilidade}</span></td>
+            <td>
+              <button class="button button-danger" type="button" data-action="delete-book" data-id="${escapeHtml(livro._id)}">
+                ${icon("trash")}
+                Remover
+              </button>
             </td>
           </tr>
-        `).join('');
-      } catch (erro) {
-        console.error('Erro ao carregar livros:', erro);
-        mostrarMensagem('livros', 'Erro ao carregar livros', 'error');
-      }
+        `;
+      }).join("");
+
+      renderDisponiveis();
+      renderMetrics();
     }
 
-    async function adicionarLivro(event) {
-      event.preventDefault();
-      const livro = {
-        titulo: document.getElementById('titulo').value,
-        autor: document.getElementById('autor').value,
-        isbn: document.getElementById('isbn').value,
-        quantidade: parseInt(document.getElementById('quantidade').value)
-      };
+    function renderDisponiveis() {
+      const disponiveis = state.livros.filter((livro) => Number(getDisponiveis(livro)) > 0);
+      const select = $("#livro-select");
+      const list = $("#lista-disponiveis");
 
+      $("#disponiveis-count").textContent = `${disponiveis.length} livro(s) com exemplares`;
+      select.innerHTML = `<option value="">Selecione um livro</option>${disponiveis.map((livro) => `
+        <option value="${escapeHtml(livro._id)}" data-disponivel="${getDisponiveis(livro)}" data-total="${getTotal(livro)}">
+          ${escapeHtml(livro.titulo)}
+        </option>
+      `).join("")}`;
+
+      if (disponiveis.length === 0) {
+        list.innerHTML = `
+          <div class="empty">
+            <div>
+              <strong>Nenhum exemplar disponivel</strong>
+              <span>Cadastre livros ou registre devolucoes.</span>
+            </div>
+          </div>
+        `;
+        $("#disponibilidade-info").textContent = "";
+        return;
+      }
+
+      list.innerHTML = disponiveis.slice(0, 8).map((livro) => `
+        <article class="book-option">
+          <div class="book-option-title">${escapeHtml(livro.titulo)}</div>
+          <div class="book-option-meta">${escapeHtml(livro.autor)} - ${getDisponiveis(livro)} de ${getTotal(livro)} disponiveis</div>
+        </article>
+      `).join("");
+    }
+
+    function renderEmprestimos() {
+      const tbody = $("#tbody-emprestimos");
+      $("#emprestimos-count").textContent = `${state.emprestimos.length} registro(s) encontrados`;
+
+      if (state.emprestimos.length === 0) {
+        tbody.innerHTML = emptyRow(7, "Nenhum emprestimo registrado", "Os emprestimos criados aparecerao aqui.");
+        renderMetrics();
+        return;
+      }
+
+      tbody.innerHTML = state.emprestimos.map((emprestimo) => {
+        const statusAtivo = emprestimo.status === "ativo";
+        const statusClass = statusAtivo ? "badge-warning" : "badge-success";
+        const statusText = statusAtivo ? "Ativo" : "Devolvido";
+        const titulo = emprestimo.titulo_livro ?? emprestimo.tituloLivro ?? "Livro";
+        const usuario = emprestimo.usuario_nome ?? emprestimo.nomeUsuario ?? "-";
+        const email = emprestimo.email_usuario ?? emprestimo.emailUsuario ?? "-";
+        const dataEmprestimo = emprestimo.data_emprestimo ?? emprestimo.dataEmprestimo;
+        const dataPrevista = emprestimo.data_devolucao_prevista ?? emprestimo.devolucaoPrevista;
+
+        return `
+          <tr>
+            <td><span class="strong">${escapeHtml(titulo)}</span></td>
+            <td>${escapeHtml(usuario)}</td>
+            <td>${escapeHtml(email)}</td>
+            <td>${formatDate(dataEmprestimo)}</td>
+            <td>${formatDate(dataPrevista)}</td>
+            <td><span class="badge ${statusClass}">${statusText}</span></td>
+            <td>
+              ${statusAtivo ? `
+                <button class="button button-success" type="button" data-action="return-loan" data-id="${escapeHtml(emprestimo._id)}">
+                  ${icon("return")}
+                  Devolver
+                </button>
+              ` : `<span class="muted">-</span>`}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      renderMetrics();
+    }
+
+    async function carregarLivros() {
       try {
-        const response = await fetch(`${API_URL}/livros`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(livro)
-        });
-
-        if (response.ok) {
-          event.target.reset();
-          mostrarMensagem('livros', '✅ Livro adicionado com sucesso!');
-          carregarLivros();
-          carregarLivrosDisponiveisPara();
-        } else {
-          const erro = await response.json();
-          mostrarMensagem('livros', `❌ ${erro.erro}`, 'error');
-        }
+        state.livros = await request("/livros");
+        renderLivros();
+        setStatus("API pronta");
       } catch (erro) {
-        mostrarMensagem('livros', '❌ Erro ao adicionar livro', 'error');
-      }
-    }
-
-    async function deletarLivro(id) {
-      if (!confirm('Tem certeza que deseja remover este livro?')) return;
-
-      try {
-        const response = await fetch(`${API_URL}/livros/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (response.ok) {
-          mostrarMensagem('livros', '✅ Livro removido com sucesso!');
-          carregarLivros();
-        } else {
-          const erro = await response.json();
-          mostrarMensagem('livros', `❌ ${erro.erro}`, 'error');
-        }
-      } catch (erro) {
-        mostrarMensagem('livros', '❌ Erro ao remover livro', 'error');
-      }
-    }
-
-    // ========== EMPRÉSTIMOS ==========
-    async function carregarLivrosDisponiveisPara() {
-      try {
-        const response = await fetch(`${API_URL}/livros`);
-        const livros = await response.json();
-        const select = document.getElementById('livro-select');
-
-        select.innerHTML = '<option value="">-- Escolha um livro --</option>' +
-          livros
-            .filter(l => l.disponiveis > 0)
-            .map(livro => `<option value="${livro._id}" data-disponivel="${livro.disponiveis}">${livro.titulo}</option>`)
-            .join('');
-      } catch (erro) {
-        console.error('Erro ao carregar livros:', erro);
-      }
-    }
-
-    function atualizarDisponibilidade() {
-      const select = document.getElementById('livro-select');
-      const opcaoSelecionada = select.options[select.selectedIndex];
-      const disponivel = opcaoSelecionada.dataset.disponivel;
-      const info = document.getElementById('disponibilidade-info');
-
-      if (disponivel) {
-        info.textContent = `📚 ${disponivel} exemplar(es) disponível(is)`;
-      }
-    }
-
-    async function realizarEmprestimo(event) {
-      event.preventDefault();
-
-      const livroId = document.getElementById('livro-select').value;
-      const emprestimo = {
-        livroId,
-        nomeUsuario: document.getElementById('nome-usuario').value,
-        emailUsuario: document.getElementById('email-usuario').value
-      };
-
-      try {
-        const response = await fetch(`${API_URL}/emprestimos`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(emprestimo)
-        });
-
-        if (response.ok) {
-          const resultado = await response.json();
-          event.target.reset();
-          mostrarMensagem('emprestar', `✅ Empréstimo realizado! Devolução prevista para ${new Date(resultado.devolucaoPrevista).toLocaleDateString('pt-BR')}`);
-          carregarLivrosDisponiveisPara();
-          setTimeout(() => carregarEmprestimos(), 1000);
-        } else {
-          const erro = await response.json();
-          mostrarMensagem('emprestar', `❌ ${erro.erro}`, 'error');
-        }
-      } catch (erro) {
-        mostrarMensagem('emprestar', '❌ Erro ao realizar empréstimo', 'error');
+        setStatus("API indisponivel", "error");
+        mostrarMensagem("livros", erro.message, "error");
       }
     }
 
     async function carregarEmprestimos() {
       try {
-        const response = await fetch(`${API_URL}/emprestimos`);
-        const emprestimos = await response.json();
-        const tbody = document.getElementById('tbody-emprestimos');
-
-        if (emprestimos.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>Nenhum empréstimo registrado</p></td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = emprestimos.map(emp => {
-          const dataEmprestimo = new Date(emp.dataEmprestimo).toLocaleDateString('pt-BR');
-          const devolucaoPrevista = new Date(emp.devolucaoPrevista).toLocaleDateString('pt-BR');
-          const statusClass = emp.status === 'ativo' ? 'status-ativo' : 'status-devolvido';
-          const statusTexto = emp.status === 'ativo' ? 'Ativo' : 'Devolvido';
-
-          return `
-            <tr>
-              <td><strong>${emp.tituloLivro}</strong></td>
-              <td>${emp.nomeUsuario}</td>
-              <td>${emp.emailUsuario}</td>
-              <td>${dataEmprestimo}</td>
-              <td>${devolucaoPrevista}</td>
-              <td><span class="${statusClass}">${statusTexto}</span></td>
-              <td>
-                ${emp.status === 'ativo' ? 
-                  `<button class="btn-small btn-success" onclick="devolverEmprestimo('${emp._id}')">Devolver</button>` 
-                  : '—'}
-              </td>
-            </tr>
-          `;
-        }).join('');
+        state.emprestimos = await request("/emprestimos");
+        renderEmprestimos();
+        setStatus("API pronta");
       } catch (erro) {
-        console.error('Erro ao carregar empréstimos:', erro);
-        mostrarMensagem('emprestimos', 'Erro ao carregar empréstimos', 'error');
+        setStatus("API indisponivel", "error");
+        mostrarMensagem("emprestimos", erro.message, "error");
+      }
+    }
+
+    async function carregarTudo() {
+      await Promise.all([carregarLivros(), carregarEmprestimos()]);
+    }
+
+    async function adicionarLivro(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const submit = form.querySelector("button[type='submit']");
+
+      const livro = {
+        titulo: $("#titulo").value.trim(),
+        autor: $("#autor").value.trim(),
+        isbn: $("#isbn").value.trim(),
+        exemplares_total: Number($("#quantidade").value),
+      };
+
+      submit.disabled = true;
+      try {
+        await request("/livros", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(livro),
+        });
+
+        form.reset();
+        mostrarMensagem("livros", "Livro adicionado com sucesso.");
+        await carregarLivros();
+      } catch (erro) {
+        mostrarMensagem("livros", erro.message, "error");
+      } finally {
+        submit.disabled = false;
+      }
+    }
+
+    async function removerLivro(id) {
+      if (!window.confirm("Remover este livro do acervo?")) return;
+
+      try {
+        await request(`/livros/${id}`, { method: "DELETE" });
+        mostrarMensagem("livros", "Livro removido com sucesso.");
+        await carregarLivros();
+      } catch (erro) {
+        mostrarMensagem("livros", erro.message, "error");
+      }
+    }
+
+    async function realizarEmprestimo(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const submit = form.querySelector("button[type='submit']");
+      const payload = {
+        livro_id: $("#livro-select").value,
+        usuario_nome: $("#nome-usuario").value.trim(),
+        email_usuario: $("#email-usuario").value.trim(),
+      };
+
+      submit.disabled = true;
+      try {
+        const emprestimo = await request("/emprestimos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        form.reset();
+        $("#disponibilidade-info").textContent = "";
+        mostrarMensagem(
+          "emprestar",
+          `Emprestimo registrado. Devolucao prevista para ${formatDate(emprestimo.data_devolucao_prevista ?? emprestimo.devolucaoPrevista)}.`,
+        );
+        await carregarTudo();
+      } catch (erro) {
+        mostrarMensagem("emprestar", erro.message, "error");
+      } finally {
+        submit.disabled = false;
       }
     }
 
     async function devolverEmprestimo(id) {
       try {
-        const response = await fetch(`${API_URL}/emprestimos/${id}/devolver`, {
-          method: 'PATCH'
-        });
-
-        if (response.ok) {
-          mostrarMensagem('emprestimos', '✅ Devolução registrada com sucesso!');
-          carregarEmprestimos();
-          carregarLivros();
-        } else {
-          const erro = await response.json();
-          mostrarMensagem('emprestimos', `❌ ${erro.erro}`, 'error');
-        }
+        await request(`/emprestimos/${id}/devolver`, { method: "PATCH" });
+        mostrarMensagem("emprestimos", "Devolucao registrada com sucesso.");
+        await carregarTudo();
       } catch (erro) {
-        mostrarMensagem('emprestimos', '❌ Erro ao registrar devolução', 'error');
+        mostrarMensagem("emprestimos", erro.message, "error");
       }
     }
 
-    // Carregar dados iniciais
-    carregarLivros();
+    function atualizarDisponibilidade() {
+      const selected = $("#livro-select").selectedOptions[0];
+      const disponivel = selected?.dataset.disponivel;
+      const total = selected?.dataset.total;
+
+      $("#disponibilidade-info").textContent = disponivel
+        ? `${disponivel} de ${total} exemplar(es) disponivel(is)`
+        : "";
+    }
+
+    function abrirAba(tabName) {
+      state.activeTab = tabName;
+      $$(".nav-button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === tabName);
+      });
+      $$(".tab-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === tabName);
+      });
+
+      $("#page-title").textContent = pageCopy[tabName].title;
+      $("#page-subtitle").textContent = pageCopy[tabName].subtitle;
+
+      if (tabName === "emprestar") carregarLivros();
+      if (tabName === "emprestimos") carregarEmprestimos();
+    }
+
+    function bindEvents() {
+      $$(".nav-button").forEach((button) => {
+        button.addEventListener("click", () => abrirAba(button.dataset.tab));
+      });
+
+      $("#form-livro").addEventListener("submit", adicionarLivro);
+      $("#form-emprestimo").addEventListener("submit", realizarEmprestimo);
+      $("#livro-select").addEventListener("change", atualizarDisponibilidade);
+      $("#refresh-livros").addEventListener("click", carregarLivros);
+      $("#refresh-emprestimos").addEventListener("click", carregarEmprestimos);
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+
+        if (button.dataset.action === "delete-book") {
+          removerLivro(button.dataset.id);
+        }
+
+        if (button.dataset.action === "return-loan") {
+          devolverEmprestimo(button.dataset.id);
+        }
+      });
+    }
+
+    bindEvents();
+    carregarTudo();
   </script>
 </body>
 </html>
